@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # (C) John Mair (banisterfiend) 2011
 # MIT License
 

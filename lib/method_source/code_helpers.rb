@@ -18,19 +18,34 @@ module MethodSource
     # @return [String]  The first complete expression
     # @raise [SyntaxError]  If the first complete expression can't be identified
     def expression_at(file, line_number, options={})
+      max_offset = options.delete(:max_offset) || 5
+      offset = 1
+      while true
+        begin
+          return expression_at_original(file, line_number, {
+            :negative_offset => offset
+          }.merge!(options))
+        rescue Exception => e
+          raise if offset > max_offset || line_number - offset < 1
+          offset += 1
+        end
+      end
+    end
+
+    def expression_at_original(file, line_number, options={})
       options = {
         :strict  => false,
-        :consume => 0
+        :consume => 0,
+        :negative_offset => 1
       }.merge!(options)
 
       lines = file.is_a?(Array) ? file : file.each_line.to_a
 
-      relevant_lines = lines[(line_number - 1)..-1] || []
+      relevant_lines = lines[(line_number - options[:negative_offset])..-1] || []
 
       extract_first_expression(relevant_lines, options[:consume])
     rescue SyntaxError => e
       raise if options[:strict]
-
       begin
         extract_first_expression(relevant_lines) do |code|
           code.gsub(/\#\{.*?\}/, "temp")
