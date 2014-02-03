@@ -18,7 +18,7 @@ module MethodSource
     # @return [String]  The first complete expression
     # @raise [SyntaxError]  If the first complete expression can't be identified
     def expression_at(file, line_number, options={})
-      max_offset = options.delete(:max_offset) || 15
+      max_offset = options.delete(:max_offset) || 20
       offset = 1
       while true
         begin
